@@ -4,16 +4,21 @@ PGraphics candidata;
 int dist_base_cand, dist_base_best;
 int generacion = 1, sin_mejora = 0;
 
+PVector esc_imagen;
+
 void setup() {
 
   size(1000, 550);
   noStroke();
   fill(0);
   textSize(16);
+  background(0);
 
   base = loadImage("caballero.png"); 
   best = createImage(base.width, base.height, RGB);
   candidata = createGraphics(base.width, base.height);
+
+  escala_imagen();
 
   dist_base_best = 0x7FFFFFFF;
 }
@@ -25,7 +30,7 @@ void draw() {
 
   //-- GARABATEAR ---------------------------------------------------------------
   candidata.beginDraw();
-  
+
   candidata.image(best.get(), 0, 0);
   int x = (int)random(base.width);
   int y = (int)random(base.height);
@@ -34,7 +39,6 @@ void draw() {
   candidata.noStroke();
   candidata.fill(c);
   candidata.ellipse(x, y, r, r);
-  
   candidata.endDraw();
   //-----------------------------------------------------------------------------
 
@@ -60,8 +64,8 @@ void draw() {
 
 
   //-- ACTUALIZAR INTERFACE -----------------------------------------------------
-  image(candidata, 0, 0, 500, 500);
-  image(best, 500, 0, 500, 500);
+  image(candidata, 0, 0, esc_imagen.x, esc_imagen.y);
+  image(best, 500, 0, esc_imagen.x, esc_imagen.y);
 
   fill(0);
   rect(0, 500, width, 50);
@@ -86,4 +90,17 @@ int imgdist(PImage i1, PImage i2) {
     counter += abs((i1.pixels[f]>>16 & 0xff) - (i2.pixels[f] >>16 & 0xff));
   }
   return counter;
+}
+
+
+
+
+void escala_imagen() {
+  float proporcion;
+  proporcion = (float)base.height/base.width;
+  if (proporcion>1) {
+    esc_imagen = new PVector(500/proporcion, 500);
+  } else {
+    esc_imagen = new PVector(500, 500*proporcion);
+  }
 }
