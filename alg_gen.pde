@@ -6,6 +6,7 @@ int grabar_cada = 50;
 int dist_base_cand, dist_base_best;
 int generacion = 1, sin_mejora = 0;
 float timer = 0;
+PVector esc_imagen;
 
 String garabato = "garabato_01";
 
@@ -14,20 +15,25 @@ String[] alternativas = {
   "garabato_13", "garabato_14", 
 };
 
+
+
 void setup() {
 
   size(1000, 550);
+  background(0);
   noStroke();
   fill(0);
   textSize(16);
 
   base = loadImage("caballero.png"); 
+  best = createImage(base.width, base.height, RGB);
 
   candidata = createGraphics(base.width, base.height);
   candidata.beginDraw();
   candidata.rectMode(CENTER);
-  //candidata.noStroke();
   candidata.endDraw();
+
+  escala_imagen();
 
   best = createImage(base.width, base.height, RGB);
 
@@ -37,9 +43,8 @@ void setup() {
     //best.pixels[f] = 0x6cbbff;
   }
 
-  dist_base_best = imgdist(base, best);
+  dist_base_best = 0x7FFFFFFF;
 }
-
 
 
 
@@ -61,6 +66,8 @@ void draw() {
   //-- DESCARTAR O SUSTITUIR ----------------------------------------------------
   if (dist_base_cand < dist_base_best) {
 
+    //Si la imagen candidata es mejor que best, actualizamos best
+    //y lo mismo la grabamos en disco
     best.copy(candidata.get(), 0, 0, base.width, base.height, 0, 0, base.width, base.height);
     dist_base_best = dist_base_cand;
 
@@ -78,8 +85,8 @@ void draw() {
 
 
   //-- ACTUALIZAR INTERFACE -----------------------------------------------------
-  image(candidata, 0, 0, 500, 500);
-  image(best, 500, 0, 500, 500);
+  image(candidata, 0, 0, esc_imagen.x, esc_imagen.y);
+  image(best, 500, 0, esc_imagen.x, esc_imagen.y);
 
   fill(0);
   rect(0, 500, width, 50);
@@ -93,8 +100,6 @@ void draw() {
 }
 
 
-
-
 int imgdist(PImage i1, PImage i2) {
 
   int counter = 0;
@@ -106,7 +111,15 @@ int imgdist(PImage i1, PImage i2) {
   return counter;
 }
 
-
+void escala_imagen() {
+  float proporcion;
+  proporcion = (float)base.height/base.width;
+  if (proporcion>1) {
+    esc_imagen = new PVector(500/proporcion, 500);
+  } else {
+    esc_imagen = new PVector(500, 500*proporcion);
+  }
+}
 
 //Círculos
 void garabato_01() {
@@ -120,6 +133,7 @@ void garabato_01() {
     candidata.ellipse(x, y, r, r);
   }
 }
+
 
 //Círculos con transparencia
 void garabato_02() {
@@ -436,7 +450,7 @@ void garabato_22() {
     int y = (int)random(base.height);
     color c = base.get(x+base.width/numcols/2, y);
     candidata.stroke(c);
-    candidata.line(x,y,x+base.width/numcols,y);
+    candidata.line(x, y, x+base.width/numcols, y);
   }
 }
 
